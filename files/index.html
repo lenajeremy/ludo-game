@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap.css">
+    <title>GPA Calculator</title>
+    
+</head>
+<body>
+    <div class="container ">
+        <div class="row ">
+         <div class="col-md-5 offset-md-3 ">
+            <h1 class="display-4 text-center mb-5">GPA Calculator</h1>
+        </div>
+        </div>
+        <form class="form-group" id = "number_form">
+            <input type="number" class="form-control form-control lg" id="text1" placeholder="How many courses did you take?...">
+            <div class="container text-center mt-3 mb-4">
+                <button class="btn btn-success" type = 'submit' id="button1">Proceed</button>
+            </div>
+        </form>
+           <div class="container courseDetails mb-4"><h2>Course Details:</h2>
+            <form class="form allCourses">
+            <h6 id = 'course_id'></h6>
+                <div class="form-group">
+                    <input type="text" id="text2" class="form-control form-control mb-4" placeholder="Enter your score...">
+                    <input type="text" id="text3" class="form-control form-control" placeholder="Enter your unit...">
+                </div>
+
+                <button class="btn btn-primary submitBtn" type='submit' id="button2">Next</button>
+            </form>
+            </div>
+        
+            
+
+            <div id="output">
+            <h4>Your Total GPA is:</h4><div class="mt-4" id="text4"></div>
+
+            <h4>Your result is:</h4><div id="text5"></div>
+        </div>
+    </div>
+
+        <script src="gpa.js"></script>
+</body>
+</html>

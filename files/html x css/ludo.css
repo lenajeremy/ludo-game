@@ -1,0 +1,236 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+h1{
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 20px;
+  font-size: 30px;
+  z-index: 2;
+  color: white;
+}
+.ludo {
+  width: 720px;
+  height: 720px;
+  border: 4px solid black;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border: 6px solid white;
+}
+.house {
+  width: 288px;
+  height: 288px;
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+.house p {
+  position: absolute;
+  font-family: monospace;
+  font-size: 5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: rgb(199, 199, 199);
+  pointer-events: none;
+  z-index: 1;
+}
+#house1 {
+  background: linear-gradient(to top left, rgb(255, 0, 0), rgb(59, 1, 1));
+  top: 0;
+  left: 0;
+}
+#house1 .seed {
+  background: linear-gradient(to top left, rgb(255, 0, 0), rgb(59, 1, 1));
+}
+#house2 {
+  background: linear-gradient(to top right, rgb(0, 0, 253), rgb(0, 0, 0));
+  top: 0;
+  right: 0;
+}
+#house2 .seed {
+  background: linear-gradient(to top right, rgb(0, 0, 253), rgb(0, 0, 0));
+}
+#house3 {
+  background: linear-gradient(to bottom left, rgb(255, 255, 0), rgb(37, 37, 3));
+  bottom: 0;
+  left: 0;
+}
+#house3 .seed {
+  background: linear-gradient(to bottom left, rgb(255, 255, 0), rgb(37, 37, 3));
+}
+#house4 {
+  background: linear-gradient(to bottom right, rgb(172, 79, 226), rgb(0, 0, 0));
+  bottom: 0;
+  right: 0;
+}
+#house4 .seed {
+  background: linear-gradient(to bottom right, rgb(172, 79, 226), rgb(0, 0, 0));
+}
+.center {
+  cursor: pointer;
+  width: 133px;
+  height: 133px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  transform: translate(-50%, -50%);
+}
+.center .houses{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-width: 66.5px;
+  border-style: solid;
+  border-top-color: rgb(5, 5, 202);
+  border-right-color: rgb(94, 0, 122);
+  border-bottom-color: rgb(251, 255, 0);
+  border-left-color: rgb(255, 0, 0);
+}
+.path {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  background-color: white;
+  border: 1px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.path .seed {
+  width: 85% !important;
+  height: 85% !important;
+}
+@keyframes diedance {
+  1% {
+    transform: rotate(20deg);
+  }
+  30% {
+    transform: rotate(-15deg);
+  }
+  60% {
+    transform: rotate(10deg);
+  }
+  80% {
+    transform: rotate(-5deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+.die1,
+.die2 {
+  width: 40px;
+  height: 40px;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 4px;
+  display: flex;
+  padding: 3px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: diedance 0.5s infinite;
+}
+.parent {
+  width: 50%;
+  height: 30%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: black;
+}
+.div {
+  width: 50%;
+  height: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.seed {
+  width: 55px;
+  height: 55px;
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.seed:not(.unmoved) {
+  width: 43px;
+  height: 43px;
+  z-index: 1;
+}
+.seed.selectable {
+  box-shadow: 0 0 5px 3px rgb(105, 105, 105);
+}
+.div:hover .seed.unmoved {
+  transform: scale(1.2);
+  box-shadow: 0px 0px 10px black;
+}
+.die-values {
+  position: absolute;
+  bottom: 5px;
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  display: none;
+}
+.value {
+  width: 35px;
+  height: 35px;
+  border: 2px solid blueviolet;
+  font-size: 20px;
+  font-weight: bold;
+  background: white;
+  border-radius: 20%;
+  outline: none;
+}
+.value1 {
+  left: 30%;
+}
+.value2 {
+  right: 30%;
+}
+.seedsWon {
+  position: absolute;
+  width: 130px;
+  height: 220px;
+  border: 2px solid white;
+  display: flex;
+  top: 50%;
+  transform: translateY(-50%);
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+.seedsWon .seed {
+  position: relative;
+}
+.seedsWon.player1 {
+  left: 200px;
+}
+.seedsWon.player2 {
+  right: 200px;
+}
+.seedsWon h5 {
+  top: -60px;
+  position: absolute;
+}
+.seedsWon .seed.selectable {
+  box-shadow: none;
+}
