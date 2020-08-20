@@ -439,11 +439,15 @@ function handleWin(){
   let winner = checkWinner()
   if(winner.bool){
     if(winner.winner == game.human.player){
-      alert('you won')
+      alert('Player1 won')
     } else{
-      alert('you lost')
+      alert('Player2 won')
     }
-  } else{
-    alert('no winner yet')
+    return new Promise(resolve =>{
+      setTimeout(()=>{
+        resolve
+        location.reload()
+      },5000)
+    })
   }
 }
