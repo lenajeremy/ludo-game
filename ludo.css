@@ -176,7 +176,7 @@ h1{
   z-index: 1;
 }
 .seed.selectable {
-  box-shadow: 0 0 5px 3px rgb(105, 105, 105);
+  box-shadow: 0 0 40px 8px rgb(213 213 213);
 }
 .div:hover .seed.unmoved {
   transform: scale(1.2);

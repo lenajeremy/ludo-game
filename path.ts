@@ -3,8 +3,8 @@ function getStyleValue(element, style) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  document
-    .querySelectorAll(".die")
+  (document
+    .querySelectorAll(".die") as NodeListOf<HTMLDivElement>)
     .forEach((die) => (die.style.animationPlayState = "paused"));
 });
 
@@ -72,16 +72,20 @@ class Game {
   }
 
   setActivePlayer(): void {
+    const houses = document.querySelectorAll(".house") as NodeListOf<HTMLDivElement>
 
-    document.querySelectorAll(".house").forEach(house => {
+    houses.forEach(house => {
 
       house.classList.remove("active");
-      house.querySelectorAll(".seed").forEach((seed) => (seed.style.pointerEvents = "none"));
+
+      const seeds = house.querySelectorAll(".seed") as NodeListOf<HTMLDivElement>;
+
+      seeds.forEach((seed) => (seed.style.pointerEvents = "none"));
 
       for (let activeHouse of this.activePlayer?.houses || []) {
         if (house.isSameNode(activeHouse)) {
           activeHouse.classList.add("active");
-          activeHouse.querySelectorAll(".seed").forEach((seed) => {
+          (activeHouse.querySelectorAll(".seed") as NodeListOf<HTMLDivElement>).forEach((seed) => {
             seed.style.pointerEvents = "all";
           });
         }
@@ -236,7 +240,7 @@ function gameInitialization(): void {
   // Die Functionality
   function dieValue() {
     const center = document.querySelector(".center");
-    const dievalues = document.querySelectorAll(".value");
+    const dievalues = document.querySelectorAll(".value") as NodeListOf<HTMLDivElement>;
 
     center.addEventListener("click", () => {
       function init() {
@@ -250,8 +254,8 @@ function gameInitialization(): void {
       document.querySelectorAll(".seed").forEach((seed) => seed.classList.remove("selectable"));
       document.querySelectorAll(".value").forEach((value) => (value.style.display = "block"));
 
-      const die1 = document.querySelector(".die1");
-      const die2 = document.querySelector(".die2");
+      const die1 = document.querySelector(".die1") as HTMLDivElement;
+      const die2 = document.querySelector(".die2") as HTMLDivElement;
 
 
       function random(die : HTMLDivElement) {
@@ -275,23 +279,27 @@ function gameInitialization(): void {
       random(die1);
       random(die2);
 
-      document.querySelector(".value1").textContent = die1.querySelectorAll(".dot").length;
-      document.querySelector(".value2").textContent = die2.querySelectorAll(".dot").length;
-      document.querySelector(".die-values").style.display = "flex";
+      const value1Button = document.querySelector(".value1");
+      const value2Button = document.querySelector(".value2");
+
+      value1Button.textContent = die1.querySelectorAll(".dot").length.toString();
+      value2Button.textContent = die2.querySelectorAll(".dot").length.toString();
+
+      (document.querySelector(".die-values") as HTMLDivElement).style.display = "flex";
 
     });
 
     dievalues.forEach((dievalue) => dievalue.addEventListener("click", (e) => dance(e)));
 
-    function dance(e) {
-      e.currentTarget.removeEventListener('click', (e) => dance(e));
+    function dance(e: Event) {
+      e.currentTarget.removeEventListener('click', dance);
 
       e.currentTarget.style.display = "none";
 
       e.stopPropagation();
 
       let element = e.currentTarget;
-      let houseId = game.activePlayer.map((house) => house.id);
+      let activeHouseIds = game.activePlayer.houses.map((house) => house.id);
 
       function move(e) {
 
@@ -302,8 +310,15 @@ function gameInitialization(): void {
       }
 
       seedSelectability();
-      document.querySelectorAll(".seed").forEach((seed) => {
-        if (houseId.indexOf(getSeedHouse(seed) !== -1)) {
+
+      (document.querySelectorAll(".seed") as NodeListOf<HTMLDivElement>).forEach((seed) => {
+
+        /*
+         *  if the id of the current seed is contained in the ids active player
+         *  add a listener to the seed, if not remove the event listener 
+         */
+
+        if (activeHouseIds.indexOf(getSeedHouse(seed)) !== -1) {
           seed.addEventListener("click", move)
         } else {
           seed.removeEventListener('click', move)
@@ -342,14 +357,15 @@ function gameInitialization(): void {
           else path.classList.add(`path26`);
         }
         path.style[house.position.split(" ")[1]] = (i * 48).toString() + "px";
-        path.style[house.position.split(" ")[0]] = parseInt(window.getComputedStyle(element).width.split("px")) + 48 + "px";
+        path.style[house.position.split(" ")[0]] = parseInt(getComputedStyle(element).width.split("px")[0]) + 48 + "px";
         document.querySelector(".ludo").appendChild(path);
       }
     }
+
     function seedCreator(house) {
       for (let i = 0; i < 4; i++) {
-        seed = document.createElement("div");
-        div = document.createElement("div");
+        const seed = document.createElement("div");
+        const div = document.createElement("div");
         div.className = "div";
         seed.style.background = window.getComputedStyle(
           document.querySelector(`#${house.id}`)
@@ -376,21 +392,21 @@ function seedSelectability() {
   for (let seed of document.querySelectorAll(".seed"))
     seed.classList.remove("selectable");
 
-  for (let player of game.activePlayer) {
-    document.querySelectorAll(`.seed.${player.id}`).forEach((seed) => seed.classList.add("selectable"));
+  for (let house of game.activePlayer.houses) {
+    document.querySelectorAll(`.seed.${house.id}`).forEach((seed) => seed.classList.add("selectable"));
   }
 }
 
 function seedActivityCheck(seed) {
-  for (let stuff of game.activePlayer) {
-    if (seed.classList.contains(stuff.id)) {
+  for (let house of game.activePlayer.houses) {
+    if (seed.classList.contains(house.id)) {
       return true;
     }
   }
   return false;
 }
 
-function getSeedHouse(seed) {
+function getSeedHouse(seed : HTMLDivElement) {
   for (let i = 1; i <= 4; i++) {
     if (seed.classList.contains(`house${i}`)) {
       return `house${i}`;
@@ -398,7 +414,7 @@ function getSeedHouse(seed) {
   }
 }
 
-async function moveseed(seed, element) {
+async function moveseed(seed: HTMLDivElement, diceElement: HTMLDivElement) {
   if (game.isStarted && seedActivityCheck(seed)) {
 
     /*
@@ -406,12 +422,12 @@ async function moveseed(seed, element) {
        and the dievalue is 6 (able to remove it from its position) 
      */
 
-    if (seed.classList.contains("unmoved") && element.textContent == "6") {
+    if (seed.classList.contains("unmoved") && diceElement.textContent === "6") {
 
       // the next two line updates the seed movement state
       seed.classList.remove("unmoved");
       seed.classList.add("moved");
-      seed.setAttribute("count", 0); // helps us know the number of moves the seed has made
+      seed.setAttribute("count", '0'); // helps us know the number of moves the seed has made
 
       const seedKind = document.querySelector(`.${getSeedHouse(seed)}.main`).firstElementChild;
 

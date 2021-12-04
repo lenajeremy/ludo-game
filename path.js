@@ -87,10 +87,12 @@ var Game = /** @class */ (function () {
     };
     Game.prototype.setActivePlayer = function () {
         var _this = this;
-        document.querySelectorAll(".house").forEach(function (house) {
+        var houses = document.querySelectorAll(".house");
+        houses.forEach(function (house) {
             var _a;
             house.classList.remove("active");
-            house.querySelectorAll(".seed").forEach(function (seed) { return (seed.style.pointerEvents = "none"); });
+            var seeds = house.querySelectorAll(".seed");
+            seeds.forEach(function (seed) { return (seed.style.pointerEvents = "none"); });
             for (var _i = 0, _b = ((_a = _this.activePlayer) === null || _a === void 0 ? void 0 : _a.houses) || []; _i < _b.length; _i++) {
                 var activeHouse = _b[_i];
                 if (house.isSameNode(activeHouse)) {
@@ -276,17 +278,19 @@ function gameInitialization() {
             }
             random(die1);
             random(die2);
-            document.querySelector(".value1").textContent = die1.querySelectorAll(".dot").length;
-            document.querySelector(".value2").textContent = die2.querySelectorAll(".dot").length;
+            var value1Button = document.querySelector(".value1");
+            var value2Button = document.querySelector(".value2");
+            value1Button.textContent = die1.querySelectorAll(".dot").length.toString();
+            value2Button.textContent = die2.querySelectorAll(".dot").length.toString();
             document.querySelector(".die-values").style.display = "flex";
         });
         dievalues.forEach(function (dievalue) { return dievalue.addEventListener("click", function (e) { return dance(e); }); });
         function dance(e) {
-            e.currentTarget.removeEventListener('click', function (e) { return dance(e); });
+            e.currentTarget.removeEventListener('click', dance);
             e.currentTarget.style.display = "none";
             e.stopPropagation();
             var element = e.currentTarget;
-            var houseId = game.activePlayer.map(function (house) { return house.id; });
+            var activeHouseIds = game.activePlayer.houses.map(function (house) { return house.id; });
             function move(e) {
                 // remove all the click listeners from the seed
                 document.querySelectorAll('.seed').forEach(function (seed) { seed.removeEventListener('click', move); });
@@ -294,7 +298,11 @@ function gameInitialization() {
             }
             seedSelectability();
             document.querySelectorAll(".seed").forEach(function (seed) {
-                if (houseId.indexOf(getSeedHouse(seed) !== -1)) {
+                /*
+                 *  if the id of the current seed is contained in the ids active player
+                 *  add a listener to the seed, if not remove the event listener
+                 */
+                if (activeHouseIds.indexOf(getSeedHouse(seed)) !== -1) {
                     seed.addEventListener("click", move);
                 }
                 else {
@@ -337,14 +345,14 @@ function gameInitialization() {
                         path.classList.add("path26");
                 }
                 path.style[house.position.split(" ")[1]] = (i * 48).toString() + "px";
-                path.style[house.position.split(" ")[0]] = parseInt(window.getComputedStyle(element).width.split("px")) + 48 + "px";
+                path.style[house.position.split(" ")[0]] = parseInt(getComputedStyle(element).width.split("px")[0]) + 48 + "px";
                 document.querySelector(".ludo").appendChild(path);
             }
         }
         function seedCreator(house) {
             for (var i = 0; i < 4; i++) {
-                seed = document.createElement("div");
-                div = document.createElement("div");
+                var seed = document.createElement("div");
+                var div = document.createElement("div");
                 div.className = "div";
                 seed.style.background = window.getComputedStyle(document.querySelector("#".concat(house.id))).background;
                 seed.className = "seed unmoved ".concat(house.id);
@@ -367,15 +375,15 @@ function seedSelectability() {
         var seed = _a[_i];
         seed.classList.remove("selectable");
     }
-    for (var _b = 0, _c = game.activePlayer; _b < _c.length; _b++) {
-        var player = _c[_b];
-        document.querySelectorAll(".seed.".concat(player.id)).forEach(function (seed) { return seed.classList.add("selectable"); });
+    for (var _b = 0, _c = game.activePlayer.houses; _b < _c.length; _b++) {
+        var house = _c[_b];
+        document.querySelectorAll(".seed.".concat(house.id)).forEach(function (seed) { return seed.classList.add("selectable"); });
     }
 }
 function seedActivityCheck(seed) {
-    for (var _i = 0, _a = game.activePlayer; _i < _a.length; _i++) {
-        var stuff = _a[_i];
-        if (seed.classList.contains(stuff.id)) {
+    for (var _i = 0, _a = game.activePlayer.houses; _i < _a.length; _i++) {
+        var house = _a[_i];
+        if (seed.classList.contains(house.id)) {
             return true;
         }
     }
@@ -388,7 +396,7 @@ function getSeedHouse(seed) {
         }
     }
 }
-function moveseed(seed, element) {
+function moveseed(seed, diceElement) {
     return __awaiter(this, void 0, void 0, function () {
         function sleep() {
             return new Promise(function (resolve) {
@@ -400,11 +408,11 @@ function moveseed(seed, element) {
             switch (_b.label) {
                 case 0:
                     if (!(game.isStarted && seedActivityCheck(seed))) return [3 /*break*/, 7];
-                    if (!(seed.classList.contains("unmoved") && element.textContent == "6")) return [3 /*break*/, 1];
+                    if (!(seed.classList.contains("unmoved") && diceElement.textContent === "6")) return [3 /*break*/, 1];
                     // the next two line updates the seed movement state
                     seed.classList.remove("unmoved");
                     seed.classList.add("moved");
-                    seed.setAttribute("count", 0); // helps us know the number of moves the seed has made
+                    seed.setAttribute("count", '0'); // helps us know the number of moves the seed has made
                     seedKind = document.querySelector(".".concat(getSeedHouse(seed), ".main")).firstElementChild;
                     // TODO: Comment this goddamn thing
                     /*
