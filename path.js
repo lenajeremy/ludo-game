@@ -1,33 +1,51 @@
 function getStyleValue(element, style) {
   return parseInt(window.getComputedStyle(element)[style].split("px")[0]);
 }
+
 document.addEventListener("DOMContentLoaded", () => {
   document
     .querySelectorAll(".die")
     .forEach((die) => (die.style.animationPlayState = "paused"));
 });
+
 class Game {
   constructor() {
-    this.players = {human: [document.querySelector("#house1"),document.querySelector("#house4")], bot: [document.querySelector("#house2"), document.querySelector("#house3")]};
+
+    this.players = {
+      human: [
+        document.querySelector("#house1"), 
+        document.querySelector("#house4")
+      ], 
+      bot: [
+        document.querySelector("#house2"), 
+        document.querySelector("#house3")
+      ] 
+    };
+
     this.activePlayer = [];
     this.isStarted = false;
     this.die1 = document.querySelector(".die1");
     this.die2 = document.querySelector(".die2");
   }
+
   getDie1Value() {
+    console.log(this.die1.querySelectorAll('.dot').length)
     return this.die1.querySelectorAll(".dot").length;
   }
+
   getDie2Value() {
+    console.log(this.die1.querySelectorAll('.dot').length)
     return this.die2.querySelectorAll(".dot").length;
   }
+
   initializeSelf() {
     this.setActivePlayer();
     gameInitialization();
     arrangePaths();
   }
+
   setActivePlayer() {
     document.querySelectorAll(".house").forEach((node) => {
-
       node.classList.remove("active");
       node.querySelectorAll(".seed").forEach((seed) => (seed.style.pointerEvents = "none"));
       for (let activeNode of this.activePlayer) {
@@ -39,29 +57,34 @@ class Game {
         }
       }
     });
-    if(this.activePlayer == this.players.human){
+
+    if (this.activePlayer == this.players.human) {
       document.querySelector("h1").textContent = "Your turn";
-    } else{
+    } else {
       document.querySelector("h1").textContent = "Computer's turn";
     }
   }
+
   changeActivePlayer() {
-    
-    if(!(document.querySelector('.value1').textContent==6 && document.querySelector('.value2').textContent==6)){
-      
-      if (JSON.stringify(this.activePlayer.map((player) => player.id)) == JSON.stringify(this.players.human.map((player) => player.id))){
+
+    if (this.getDie1Value() == 6 && this.getDie2Value() == 6) {
+
+      if (JSON.stringify(this.activePlayer.map((player) => player.id)) == JSON.stringify(this.players.human.map((player) => player.id))) {
         this.activePlayer = this.players.bot;
       } else {
         this.activePlayer = this.players.human;
       }
-    } else{
+    } else {
       this.activePlayer = this.activePlayer
     }
     this.setActivePlayer();
+    alert(JSON.stringify(this.activePlayer))
   }
 }
 
+
 const game = new Game();
+
 game.initializeSelf();
 
 function gameInitialization() {
@@ -179,7 +202,7 @@ function gameInitialization() {
     const dievalues = document.querySelectorAll(".value");
 
     center.addEventListener("click", () => {
-      function init(){
+      function init() {
         game.isStarted = true;
         game.activePlayer = game.players.human
         game.setActivePlayer()
@@ -200,6 +223,10 @@ function gameInitialization() {
         }, 500);
         die.querySelectorAll(".parent").forEach((node) => node.remove());
         let randomValue = Math.ceil(Math.random() * 6);
+
+        // FIXME: dont forget to change this
+        randomValue = 6;
+
 
         for (let i = 0; i < randomValue; i++) {
           let parent = document.createElement("div");
@@ -231,8 +258,8 @@ function gameInitialization() {
       let element = e.currentTarget;
       let houseId = game.activePlayer.map((house) => house.id);
 
-      function move(e){
-        document.querySelectorAll('.seed').forEach(seed => {seed.removeEventListener('click', move)});
+      function move(e) {
+        document.querySelectorAll('.seed').forEach(seed => { seed.removeEventListener('click', move) });
         moveseed(e.currentTarget, element)
       }
 
@@ -240,11 +267,11 @@ function gameInitialization() {
       document.querySelectorAll(".seed").forEach((seed) => {
         if (houseId.indexOf(getSeedHouse(seed) !== -1)) {
           seed.addEventListener("click", move)
-        } else{
+        } else {
           seed.removeEventListener('click', move)
         }
       });
-      
+
     }
   }
 
@@ -308,7 +335,7 @@ function seedSelectability(value) {
 
   for (let seed of document.querySelectorAll(".seed"))
     seed.classList.remove("selectable");
-  
+
   for (let player of game.activePlayer) {
     document.querySelectorAll(`.seed.${player.id}`).forEach((seed) => seed.classList.add("selectable"));
   }
@@ -334,21 +361,21 @@ async function moveseed(seed, element) {
       seed.classList.remove("unmoved");
       seed.classList.add("moved");
       seed.setAttribute("count", 0);
-      
-      if(document.querySelector(`.${getSeedHouse(seed)}.main`).childNodes.length != 0 && !isSameHouse(document.querySelector(`.${getSeedHouse(seed)}.main`).firstElementChild, seed)){
+
+      if (document.querySelector(`.${getSeedHouse(seed)}.main`).childNodes.length != 0 && !isSameHouse(document.querySelector(`.${getSeedHouse(seed)}.main`).firstElementChild, seed)) {
         removeElement(document.querySelector(`.${getSeedHouse(seed)}.main`).firstElementChild, seed);
         handleWin()
-      }else{
+      } else {
         document.querySelector(`.${getSeedHouse(seed)}.main`).appendChild(seed);
       }
     } else if (seed.classList.contains("moved")) {
       let count = 0
-      for(let house of game.activePlayer){
+      for (let house of game.activePlayer) {
         count += document.querySelectorAll(`.${house.id}.seed.moved`).length
       }
       console.log(count)
-      
-      if(count == 1){
+
+      if (count == 1) {
         let sum = parseInt(document.querySelector('.value1').textContent) + parseInt(document.querySelector('.value2').textContent);
         element.textContent = sum;
         document.querySelector('.value1').style.display = 'none';
@@ -357,17 +384,17 @@ async function moveseed(seed, element) {
       for (let i = 0; i < parseInt(element.textContent); i++) {
         if (seed.getAttribute("count") != 50 && seed.getAttribute("count") <= 56) {
           seed.setAttribute("count", parseInt(seed.getAttribute("count")) + 1);
-          if(seed.getAttribute('count') == 56 && i == parseInt(element.textContent) -1){
+          if (seed.getAttribute('count') == 56 && i == parseInt(element.textContent) - 1) {
             removeElement(null, seed)
             handleWin()
           }
           if (seed.parentElement.classList.contains("path52")) {
             document.querySelector(".path1").appendChild(seed);
           } else {
-            if(seed.parentElement.nextElementSibling.childNodes.length != 0 && i == parseInt(element.textContent)-1 && !isSameHouse(seed.parentElement.nextElementSibling.firstElementChild, seed)){
+            if (seed.parentElement.nextElementSibling.childNodes.length != 0 && i == parseInt(element.textContent) - 1 && !isSameHouse(seed.parentElement.nextElementSibling.firstElementChild, seed)) {
               removeElement(seed.parentElement.nextElementSibling.firstElementChild, seed);
               handleWin()
-            } else{
+            } else {
               seed.parentElement.nextElementSibling.append(seed)
             }
           }
@@ -387,24 +414,24 @@ async function moveseed(seed, element) {
   }
   element.textContent = 0;
 }
-function removeElement(old, newElement){
+function removeElement(old, newElement) {
   console.log(old)
   console.log(newElement)
-  if(old !== null){
+  if (old !== null) {
     let elementHouse = getSeedHouse(old);
     old.classList.remove('moved');
     old.classList.add('unmoved');
     let house = document.querySelector(`.house#${elementHouse}`);
-    house.querySelectorAll('.div').forEach(div=>{
-      if(div.childElementCount == 0 ) div.append(old);
+    house.querySelectorAll('.div').forEach(div => {
+      if (div.childElementCount == 0) div.append(old);
     })
   }
-  if(getSeedHouse(newElement) == 'house1' || getSeedHouse(newElement) == 'house4'){
+  if (getSeedHouse(newElement) == 'house1' || getSeedHouse(newElement) == 'house4') {
     newParent = document.querySelector('.seedsWon.player1')
     newParent.appendChild(newElement)
     console.log(newParent)
     console.log(newElement)
-  } else{
+  } else {
     newParent = document.querySelector('.seedsWon.player2');
     newParent.appendChild(newElement);
     console.log(newParent);
@@ -412,42 +439,42 @@ function removeElement(old, newElement){
     newParent.append(newElement)
   }
 }
-function isSameHouse(first, second){
+function isSameHouse(first, second) {
   firstHouse = getSeedHouse(first);
   secondHouse = getSeedHouse(second);
-  
-  if(firstHouse == secondHouse){
+
+  if (firstHouse == secondHouse) {
     return true
-  } else if((firstHouse == 'house1' && secondHouse == 'house4') ||(firstHouse == 'house4' && secondHouse == 'house1')){
+  } else if ((firstHouse == 'house1' && secondHouse == 'house4') || (firstHouse == 'house4' && secondHouse == 'house1')) {
     return true
-  }else if((firstHouse == 'house2' && secondHouse == 'house3') || (firstHouse == 'house3' && secondHouse == 'house2')){
+  } else if ((firstHouse == 'house2' && secondHouse == 'house3') || (firstHouse == 'house3' && secondHouse == 'house2')) {
     return true
-  } else{
+  } else {
     return false
   }
 }
-function checkWinner(){
-  if(document.querySelector('.seedsWon.player1').querySelectorAll('.seed').length == 8){
-    return {bool: true, winner: game.players.human}
-  } else if(document.querySelector('.seedsWon.player2').querySelectorAll('.seed').length == 8){
-    return {bool: true, winner: game.players.bot}
-  } else{
-    return {bool: false, winner: null}
+function checkWinner() {
+  if (document.querySelector('.seedsWon.player1').querySelectorAll('.seed').length == 8) {
+    return { bool: true, winner: game.players.human }
+  } else if (document.querySelector('.seedsWon.player2').querySelectorAll('.seed').length == 8) {
+    return { bool: true, winner: game.players.bot }
+  } else {
+    return { bool: false, winner: null }
   }
 }
-function handleWin(){
+function handleWin() {
   let winner = checkWinner()
-  if(winner.bool){
-    if(winner.winner == game.human.player){
+  if (winner.bool) {
+    if (winner.winner == game.human.player) {
       alert('Player1 won')
-    } else{
+    } else {
       alert('Player2 won')
     }
-    return new Promise(resolve =>{
-      setTimeout(()=>{
+    return new Promise(resolve => {
+      setTimeout(() => {
         resolve
         location.reload()
-      },5000)
+      }, 5000)
     })
   }
 }
