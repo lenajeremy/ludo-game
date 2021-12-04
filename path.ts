@@ -397,7 +397,7 @@ function seedSelectability() {
   }
 }
 
-function seedActivityCheck(seed) {
+function seedActivityCheck(seed: HTMLDivElement) {
   for (let house of game.activePlayer.houses) {
     if (seed.classList.contains(house.id)) {
       return true;
@@ -406,7 +406,7 @@ function seedActivityCheck(seed) {
   return false;
 }
 
-function getSeedHouse(seed : HTMLDivElement) {
+function getSeedHouse(seed: HTMLDivElement) {
   for (let i = 1; i <= 4; i++) {
     if (seed.classList.contains(`house${i}`)) {
       return `house${i}`;
@@ -448,8 +448,9 @@ async function moveseed(seed: HTMLDivElement, diceElement: HTMLDivElement) {
         document.querySelector(`.${getSeedHouse(seed)}.main`).appendChild(seed);
       }
     } else if (seed.classList.contains("moved")) {
+      alert('this stuff should move now')
       let count = 0
-      for (let house of game.activePlayer) {
+      for (let house of game.activePlayer.houses) {
         count += document.querySelectorAll(`.${house.id}.seed.moved`).length
       }
       console.log(count)

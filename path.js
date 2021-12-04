@@ -430,8 +430,9 @@ function moveseed(seed, diceElement) {
                     return [3 /*break*/, 7];
                 case 1:
                     if (!seed.classList.contains("moved")) return [3 /*break*/, 7];
+                    alert('this stuff should move now');
                     count = 0;
-                    for (_i = 0, _a = game.activePlayer; _i < _a.length; _i++) {
+                    for (_i = 0, _a = game.activePlayer.houses; _i < _a.length; _i++) {
                         house = _a[_i];
                         count += document.querySelectorAll(".".concat(house.id, ".seed.moved")).length;
                     }
