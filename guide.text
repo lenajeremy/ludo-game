@@ -1,0 +1,28 @@
+/*
+         *  if the seed has not moved, check if the value is 6
+         *      if the value is 6, bring the seed out,
+         *      check if there is a something where the seed is to be placed
+         *          if there is something there, check if the thing there is in the same house
+         *          as the seed that is to be placed there
+         *              if they are of the same house, 
+         *                  do not remove the old one,
+         *                  let them inhabit the same position
+         *              else
+         *                  send the old one to his village
+         *                  send the new one to the winning side
+         *          else
+         *              place the new one there
+         *      else
+         *          do not do anything, do not remove the event listeners yet
+         *  else
+         *      if it has moved exactly 50 times already
+         *          put it in the child of the line to his village
+         *      else
+         *          if is has moved more than 50 times
+         *              if the dieValue plus its current move count > 56
+         *                  do not move at all
+         *              move the seed
+         *          else
+         *              move the seed(checking for mashups along the way)
+         * 
+         */

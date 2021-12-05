@@ -34,8 +34,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+function sleep() {
+    return new Promise(function (resolve) {
+        setTimeout(resolve, 400);
+    });
+}
 function getStyleValue(element, style) {
-    return parseInt(window.getComputedStyle(element)[style].split("px")[0]);
+    return parseInt(getComputedStyle(element)[style].split("px")[0]);
 }
 document.addEventListener("DOMContentLoaded", function () {
     document
@@ -151,7 +156,7 @@ function gameInitialization() {
             for (var i = 0; i < 6; i++) {
                 var path = document.createElement("div");
                 path.className = "path";
-                path.classList.add("path".concat(pathIndex));
+                path.classList.add("path" + pathIndex);
                 if (i == 1 && element.id == "house1") {
                     path.style.background = window.getComputedStyle(element).background;
                     path.classList.add("main");
@@ -177,7 +182,7 @@ function gameInitialization() {
             for (var i = 0; i < 6; i++) {
                 var path = document.createElement("div");
                 path.className = "path";
-                path.classList.add("path".concat(pathIndex));
+                path.classList.add("path" + pathIndex);
                 document.querySelector(".ludo").appendChild(path);
                 if (i == 1 && element.id == "house4") {
                     path.style.background = window.getComputedStyle(element).background;
@@ -206,7 +211,7 @@ function gameInitialization() {
         for (var i = 5; i >= 0; i--) {
             var path = document.createElement("div");
             path.className = "path";
-            path.classList.add("path".concat(pathIndex));
+            path.classList.add("path" + pathIndex);
             if ((pathIndex + 1) % 13 == 0) {
                 pathIndex += 2;
             }
@@ -258,8 +263,8 @@ function gameInitialization() {
             game.isStarted ? game.changeActivePlayer() : init();
             document.querySelectorAll(".seed").forEach(function (seed) { return seed.classList.remove("selectable"); });
             document.querySelectorAll(".value").forEach(function (value) { return (value.style.display = "block"); });
-            var die1 = document.querySelector(".die1");
-            var die2 = document.querySelector(".die2");
+            var value1Button = document.querySelector(".value1");
+            var value2Button = document.querySelector(".value2");
             function random(die) {
                 die.style.animationPlayState = "running";
                 setTimeout(function () {
@@ -276,13 +281,19 @@ function gameInitialization() {
                     die.appendChild(parent_1);
                 }
             }
-            random(die1);
-            random(die2);
-            var value1Button = document.querySelector(".value1");
-            var value2Button = document.querySelector(".value2");
-            value1Button.textContent = die1.querySelectorAll(".dot").length.toString();
-            value2Button.textContent = die2.querySelectorAll(".dot").length.toString();
-            document.querySelector(".die-values").style.display = "flex";
+            alert(getComputedStyle(value1Button).display);
+            if (game.isStarted &&
+                (getComputedStyle(value1Button).display === 'flex' ||
+                    getComputedStyle(value2Button).display === 'flex')) {
+                alert('Please make a valid move');
+            }
+            else {
+                random(game.die1);
+                random(game.die2);
+                value1Button.textContent = game.die1.querySelectorAll(".dot").length.toString();
+                value2Button.textContent = game.die2.querySelectorAll(".dot").length.toString();
+                document.querySelector(".die-values").style.display = "flex";
+            }
         });
         dievalues.forEach(function (dievalue) { return dievalue.addEventListener("click", function (e) { return dance(e); }); });
         function dance(e) {
@@ -292,9 +303,11 @@ function gameInitialization() {
             var element = e.currentTarget;
             var activeHouseIds = game.activePlayer.houses.map(function (house) { return house.id; });
             function move(e) {
-                // remove all the click listeners from the seed
-                document.querySelectorAll('.seed').forEach(function (seed) { seed.removeEventListener('click', move); });
-                moveseed(e.currentTarget, element);
+                var moved = moveseed(e.currentTarget, element);
+                if (moved) {
+                    // remove all the click listeners from the seed
+                    document.querySelectorAll('.seed').forEach(function (seed) { seed.removeEventListener('click', move); });
+                }
             }
             seedSelectability();
             document.querySelectorAll(".seed").forEach(function (seed) {
@@ -354,11 +367,11 @@ function gameInitialization() {
                 var seed = document.createElement("div");
                 var div = document.createElement("div");
                 div.className = "div";
-                seed.style.background = window.getComputedStyle(document.querySelector("#".concat(house.id))).background;
-                seed.className = "seed unmoved ".concat(house.id);
+                seed.style.background = window.getComputedStyle(document.querySelector("#" + house.id)).background;
+                seed.className = "seed unmoved " + house.id;
                 seed.style.pointerEvents = "none";
                 div.appendChild(seed);
-                document.querySelector("#".concat(house.id)).appendChild(div);
+                document.querySelector("#" + house.id).appendChild(div);
             }
         }
     }
@@ -366,7 +379,7 @@ function gameInitialization() {
 function arrangePaths() {
     for (var i = 1; i <= 52; i++) {
         var ludo = document.querySelector(".ludo");
-        var node = document.querySelector(".path".concat(i));
+        var node = document.querySelector(".path" + i);
         ludo.insertBefore(node, document.querySelector(".center"));
     }
 }
@@ -377,7 +390,7 @@ function seedSelectability() {
     }
     for (var _b = 0, _c = game.activePlayer.houses; _b < _c.length; _b++) {
         var house = _c[_b];
-        document.querySelectorAll(".seed.".concat(house.id)).forEach(function (seed) { return seed.classList.add("selectable"); });
+        document.querySelectorAll(".seed." + house.id).forEach(function (seed) { return seed.classList.add("selectable"); });
     }
 }
 function seedActivityCheck(seed) {
@@ -391,98 +404,130 @@ function seedActivityCheck(seed) {
 }
 function getSeedHouse(seed) {
     for (var i = 1; i <= 4; i++) {
-        if (seed.classList.contains("house".concat(i))) {
-            return "house".concat(i);
+        if (seed.classList.contains("house" + i)) {
+            return "house" + i;
         }
     }
 }
 function moveseed(seed, diceElement) {
     return __awaiter(this, void 0, void 0, function () {
-        function sleep() {
-            return new Promise(function (resolve) {
-                setTimeout(resolve, 400);
-            });
+        function takeAction(seed, possibleAction, isTrue, isFalse) {
+            switch (possibleAction) {
+                case SeedPossibilities.HAS_MOVED:
+                    seed.classList.contains('unmoved') ? isTrue() : isFalse();
+                    break;
+                case SeedPossibilities.ELEMENT_EXISTS_IN_DESTINATION:
+                    takeAction(seed, SeedPossibilities.HAS_MOVED, 
+                    // if the seed has moved
+                    function () {
+                        // get the seed path number
+                        var seedParentElementPathNumber = parseInt(seed.parentElement.classList.item(1).split('path')[1]);
+                        var seedDestinationParent = document.querySelector(".path" + (seedParentElementPathNumber + dieValue));
+                        seedDestinationParent.hasChildNodes() ? isTrue(seedDestinationParent.firstElementChild) : isFalse();
+                    }, 
+                    // if the seed has not moved
+                    function () {
+                        var seedHouse = getSeedHouse(seed);
+                        var seedHouseInitPath = document.querySelector("path main " + seedHouse);
+                        seedHouseInitPath.hasChildNodes() ? isTrue() : isFalse();
+                    });
+                    break;
+                case SeedPossibilities.VALUE_IS_6:
+                    dieValue === 6 ? isTrue() : isFalse();
+                    break;
+                case SeedPossibilities.MOVED_50_TIMES:
+                    var timesMoved = parseInt(seed.getAttribute('count'));
+                    timesMoved === 50 ? isTrue() : isFalse();
+                    break;
+                case SeedPossibilities.MOVED_LESS_THAN_50_TIMES:
+                    timesMoved < 50 ? isTrue() : isFalse();
+                    break;
+                case SeedPossibilities.MOVED_MORE_THAN_50_TIMES:
+                    timesMoved > 50 ? isTrue() : isFalse();
+                    break;
+            }
         }
-        var seedKind, count, _i, _a, house, sum, i;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var SeedPossibilities, hasSeedMoved, dieValue, seedKind, i;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0:
+                    (function (SeedPossibilities) {
+                        SeedPossibilities[SeedPossibilities["HAS_MOVED"] = 0] = "HAS_MOVED";
+                        SeedPossibilities[SeedPossibilities["ELEMENT_EXISTS_IN_DESTINATION"] = 1] = "ELEMENT_EXISTS_IN_DESTINATION";
+                        SeedPossibilities[SeedPossibilities["ELEMENT_IN_DESTINATION_IS_OF_SAME_HOUSE"] = 2] = "ELEMENT_IN_DESTINATION_IS_OF_SAME_HOUSE";
+                        SeedPossibilities[SeedPossibilities["VALUE_IS_6"] = 3] = "VALUE_IS_6";
+                        SeedPossibilities[SeedPossibilities["MOVED_50_TIMES"] = 4] = "MOVED_50_TIMES";
+                        SeedPossibilities[SeedPossibilities["MOVED_MORE_THAN_50_TIMES"] = 5] = "MOVED_MORE_THAN_50_TIMES";
+                        SeedPossibilities[SeedPossibilities["MOVED_LESS_THAN_50_TIMES"] = 6] = "MOVED_LESS_THAN_50_TIMES";
+                    })(SeedPossibilities || (SeedPossibilities = {}));
+                    hasSeedMoved = false;
+                    dieValue = parseInt(diceElement.textContent);
+                    takeAction(seed, SeedPossibilities.ELEMENT_EXISTS_IN_DESTINATION, function (oldElement) {
+                        for (var i = 0; i < dieValue; i++) {
+                        }
+                    }, function () { });
                     if (!(game.isStarted && seedActivityCheck(seed))) return [3 /*break*/, 7];
-                    if (!(seed.classList.contains("unmoved") && diceElement.textContent === "6")) return [3 /*break*/, 1];
+                    // the seed has not moved at all
+                    if (seed.classList.contains('unmoved')) {
+                        if (dieValue === 6) {
+                            moveToNextPhase(seed, seed.parentElement.nextElementSibling);
+                        }
+                    }
+                    if (!seed.classList.contains("unmoved")) return [3 /*break*/, 1];
+                    if (dieValue === 6) {
+                    }
                     // the next two line updates the seed movement state
                     seed.classList.remove("unmoved");
                     seed.classList.add("moved");
                     seed.setAttribute("count", '0'); // helps us know the number of moves the seed has made
-                    seedKind = document.querySelector(".".concat(getSeedHouse(seed), ".main")).firstElementChild;
+                    seedKind = document.querySelector("." + getSeedHouse(seed) + ".main").firstElementChild;
                     // TODO: Comment this goddamn thing
                     /*
                      * If there are still seeds in the house of the seed that was currently seleected
                      * and they are not of
                      */
-                    if (document.querySelector(".".concat(getSeedHouse(seed), ".main")).childNodes.length != 0
+                    if (document.querySelector("." + getSeedHouse(seed) + ".main").childNodes.length != 0
                         && !isSameHouse(seedKind, seed)) {
-                        removeElement(document.querySelector(".".concat(getSeedHouse(seed), ".main")).firstElementChild, seed);
+                        removeElement(document.querySelector("." + getSeedHouse(seed) + ".main").firstElementChild, seed);
                         handleWin();
                     }
                     else {
-                        document.querySelector(".".concat(getSeedHouse(seed), ".main")).appendChild(seed);
+                        document.querySelector("." + getSeedHouse(seed) + ".main").appendChild(seed);
                     }
                     return [3 /*break*/, 7];
                 case 1:
                     if (!seed.classList.contains("moved")) return [3 /*break*/, 7];
                     alert('this stuff should move now');
-                    count = 0;
-                    for (_i = 0, _a = game.activePlayer.houses; _i < _a.length; _i++) {
-                        house = _a[_i];
-                        count += document.querySelectorAll(".".concat(house.id, ".seed.moved")).length;
-                    }
-                    console.log(count);
-                    if (count == 1) {
-                        sum = parseInt(document.querySelector('.value1').textContent) + parseInt(document.querySelector('.value2').textContent);
-                        element.textContent = sum;
-                        document.querySelector('.value1').style.display = 'none';
-                        document.querySelector('.value2').style.display = 'none';
-                    }
-                    i = 0;
-                    _b.label = 2;
+                    // let sum = parseInt(document.querySelector('.value1').textContent) + parseInt(document.querySelector('.value2').textContent);
+                    // diceElement.textContent = sum;
+                    document.querySelector('.value1').style.display = 'none';
+                    document.querySelector('.value2').style.display = 'none';
+                    if (!(dieValue + seedInitialCountAttribute > 55)) return [3 /*break*/, 2];
+                    alert('this move is not valid');
+                    game.changeActivePlayer();
+                    return [3 /*break*/, 7];
                 case 2:
-                    if (!(i < parseInt(element.textContent))) return [3 /*break*/, 7];
-                    if (!(seed.getAttribute("count") != 50 && seed.getAttribute("count") <= 56)) return [3 /*break*/, 4];
-                    seed.setAttribute("count", parseInt(seed.getAttribute("count")) + 1);
-                    if (seed.getAttribute('count') == 56 && i == parseInt(element.textContent) - 1) {
-                        removeElement(null, seed);
-                        handleWin();
-                    }
-                    if (seed.parentElement.classList.contains("path52")) {
-                        document.querySelector(".path1").appendChild(seed);
-                    }
-                    else {
-                        if (seed.parentElement.nextElementSibling.childNodes.length != 0 && i == parseInt(element.textContent) - 1 && !isSameHouse(seed.parentElement.nextElementSibling.firstElementChild, seed)) {
-                            removeElement(seed.parentElement.nextElementSibling.firstElementChild, seed);
-                            handleWin();
-                        }
-                        else {
-                            seed.parentElement.nextElementSibling.append(seed);
-                        }
-                    }
-                    return [4 /*yield*/, sleep()];
+                    if (!(dieValue + seedInitialCountAttribute === 55)) return [3 /*break*/, 3];
+                    removeElement(null, seed);
+                    handleWin();
+                    return [3 /*break*/, 7];
                 case 3:
-                    _b.sent();
-                    return [3 /*break*/, 6];
+                    i = 1;
+                    _a.label = 4;
                 case 4:
-                    if (!(seed.getAttribute("count") == 50)) return [3 /*break*/, 6];
-                    document.querySelector(".path.".concat(getSeedHouse(seed), "entrance")).appendChild(seed);
-                    seed.setAttribute("count", parseInt(seed.getAttribute("count")) + 1);
+                    if (!(i <= dieValue)) return [3 /*break*/, 7];
+                    seed.setAttribute('count', (seedInitialCountAttribute + i).toString());
+                    seed.parentElement.nextElementSibling.append(seed);
                     return [4 /*yield*/, sleep()];
                 case 5:
-                    _b.sent();
-                    _b.label = 6;
+                    _a.sent();
+                    _a.label = 6;
                 case 6:
                     i++;
-                    return [3 /*break*/, 2];
+                    return [3 /*break*/, 4];
                 case 7:
-                    element.textContent = 0;
-                    return [2 /*return*/];
+                    diceElement.textContent = String(0);
+                    return [2 /*return*/, seedHasMoved];
             }
         });
     });
@@ -502,7 +547,7 @@ function removeElement(old, newElement) {
         var elementHouse = getSeedHouse(old);
         old.classList.remove('moved');
         old.classList.add('unmoved');
-        var house = document.querySelector(".house#".concat(elementHouse));
+        var house = document.querySelector(".house#" + elementHouse);
         house.querySelectorAll('.div').forEach(function (div) {
             // put the seed that was eaten back to the element house
             if (div.childElementCount == 0)
